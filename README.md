@@ -1,6 +1,5 @@
 # Kubernetes Slurm HPC Lab
 
-Nicky,
 
 This lab is a proof-of-work version of a production HPC platform pattern: Kubernetes owns the infrastructure lifecycle, while Slurm remains the workload scheduler that engineers actually use for batch, MPI, EDA, and ML jobs.
 
