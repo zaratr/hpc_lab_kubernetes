@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-internal
+  namespace: hpc-system
+spec:
+  selector:
+    app: hpc-mariadb
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hpc-mariadb
+  namespace: hpc-system
+spec:
+  serviceName: mariadb-internal
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hpc-mariadb
+  template:
+    metadata:
+      labels:
+        app: hpc-mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.11
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: hpcrootpass
+            - name: MARIADB_DATABASE
+              value: slurm_acct_db
+            - name: MARIADB_USER
+              value: slurm
+            - name: MARIADB_PASSWORD
+              value: slurm
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 4Gi

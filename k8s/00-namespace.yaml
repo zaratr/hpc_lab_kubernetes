@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hpc-system
+  labels:
+    app.kubernetes.io/name: hpc-kubernetes
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slurm-config
+  namespace: hpc-system
+data:
+  slurm.conf: |
+    ClusterName=k8s-hpc-system
+    SlurmctldHost=hpc-scheduler-core
+    SlurmUser=slurm
+    SlurmdUser=root
+    StateSaveLocation=/var/spool/slurm/ctld
+    SlurmdSpoolDir=/var/spool/slurm/d
+    AuthType=auth/munge
+    MpiDefault=pmix
+    ProctrackType=proctrack/linuxproc
+    ReturnToService=2
+    SlurmctldPidFile=/run/slurmctld.pid
+    SlurmdPidFile=/run/slurmd.pid
+    SlurmctldPort=6817
+    SlurmdPort=6818
+    SlurmdParameters=config_overrides
+    SchedulerType=sched/backfill
+    SelectType=select/cons_tres
+    SelectTypeParameters=CR_Core_Memory
+    AccountingStorageType=accounting_storage/slurmdbd
+    AccountingStorageHost=hpc-scheduler-core
+    JobAcctGatherType=jobacct_gather/linux
+    JobCompType=jobcomp/none
+    TaskPlugin=task/none
+    KillWait=30
+    MinJobAge=300
+    SlurmctldTimeout=120
+    SlurmdTimeout=120
+    DefMemPerCPU=1024
+    MaxMemPerCPU=8192
+    Licenses=cadence:2,synopsys:2,siemens:1
+    NodeName=hpc-compute-nodes-[0-3] CPUs=2 RealMemory=3072 State=UNKNOWN
+    PartitionName=eda Nodes=hpc-compute-nodes-[0-3] Default=YES MaxTime=02:00:00 State=UP OverSubscribe=NO
+    PartitionName=debug Nodes=hpc-compute-nodes-[0-3] MaxTime=00:30:00 State=UP OverSubscribe=YES
+    PartitionName=ml Nodes=hpc-compute-nodes-[0-3] MaxTime=04:00:00 State=UP OverSubscribe=NO
+  slurmdbd.conf: |
+    AuthType=auth/munge
+    AuthInfo=/var/run/munge/munge.socket.2
+    SlurmUser=slurm
+    DebugLevel=verbose
+    LogFile=/var/log/slurm/slurmdbd.log
+    PidFile=/run/slurmdbd.pid
+    StorageType=accounting_storage/mysql
+    StorageHost=mariadb-internal
+    StoragePort=3306
+    StorageUser=slurm
+    StoragePass=slurm
+    StorageLoc=slurm_acct_db
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: munge-key
+  namespace: hpc-system
+type: Opaque
+stringData:
+  munge.key: hpc-system-kubernetes-munge-key-replace-before-real-use
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-home
+  namespace: hpc-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-projects
+  namespace: hpc-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-scratch
+  namespace: hpc-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi

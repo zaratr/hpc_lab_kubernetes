@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-workspace
+  namespace: hpc-system
+spec:
+  selector:
+    app: login-workspace
+  ports:
+    - name: ssh
+      port: 22
+      targetPort: 22
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-workspace
+  namespace: hpc-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-workspace
+  template:
+    metadata:
+      labels:
+        app: login-workspace
+    spec:
+      containers:
+        - name: login
+          image: zaratr/hpc-node:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: HPC_ROLE
+              value: login
+          ports:
+            - name: ssh
+              containerPort: 22
+          volumeMounts:
+            - name: slurm-config
+              mountPath: /config
+              readOnly: true
+            - name: munge-key
+              mountPath: /config/munge.key
+              subPath: munge.key
+              readOnly: true
+            - name: home
+              mountPath: /home/hpcuser
+            - name: projects
+              mountPath: /projects
+            - name: scratch
+              mountPath: /scratch
+      volumes:
+        - name: slurm-config
+          configMap:
+            name: slurm-config
+        - name: munge-key
+          secret:
+            secretName: munge-key
+            defaultMode: 0400
+        - name: home
+          persistentVolumeClaim:
+            claimName: shared-home
+        - name: projects
+          persistentVolumeClaim:
+            claimName: shared-projects
+        - name: scratch
+          persistentVolumeClaim:
+            claimName: shared-scratch
