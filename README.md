@@ -126,6 +126,14 @@ Scale back down:
 kubectl -n hpc-system scale deployment hpc-compute-nodes --replicas=2
 ```
 
+## CI
+
+GitHub Actions builds the unified image on pushes and pull requests to `main` using:
+
+```bash
+docker build -t zaratr/hpc-node:latest -f docker/hpc-node/Dockerfile .
+```
+
 ## Notes
 
 - `config/munge.key` is a lab-only shared credential and must be replaced for any real environment.

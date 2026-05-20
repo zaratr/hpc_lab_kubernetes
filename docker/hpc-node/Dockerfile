@@ -2,6 +2,12 @@ FROM rockylinux:9
 
 ARG TENSORFLOW_PACKAGE=tensorflow-cpu==2.15.1
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+LABEL org.opencontainers.image.title="HPC Kubernetes Slurm Node" \
+      org.opencontainers.image.description="Unified Rocky Linux 9 Slurm, OpenMPI, and TensorFlow node image for Kubernetes." \
+      org.opencontainers.image.source="https://github.com/zaratr/hpc_lab_kubernetes"
+
 # Unified Slurm/Kubernetes node image. Runtime role selection happens in entrypoint.sh.
 RUN printf '%s\n' \
       'retries=5' \
@@ -23,7 +29,6 @@ RUN printf '%s\n' \
       lsof \
       mariadb \
       munge \
-      munge-devel \
       munge-libs \
       ncurses \
       openssh-clients \
@@ -62,8 +67,8 @@ RUN getent group slurm >/dev/null || groupadd -r slurm && \
     chown -R slurm:slurm /var/log/slurm /var/spool/slurm && \
     chown -R hpcuser:hpcuser /home/hpcuser /hpc-workspace /projects /scratch /logs
 
-ENV PATH="/usr/lib64/openmpi/bin:${PATH}" \
-    LD_LIBRARY_PATH="/usr/lib64/openmpi/lib:${LD_LIBRARY_PATH:-}"
+ENV PATH="/usr/lib64/openmpi/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/lib64/openmpi/lib"
 
 WORKDIR /hpc-workspace
 
