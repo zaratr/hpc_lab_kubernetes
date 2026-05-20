@@ -22,8 +22,8 @@ data:
     MpiDefault=pmix
     ProctrackType=proctrack/linuxproc
     ReturnToService=2
-    SlurmctldPidFile=/run/slurmctld.pid
-    SlurmdPidFile=/run/slurmd.pid
+    SlurmctldPidFile=/run/slurm/slurmctld.pid
+    SlurmdPidFile=/run/slurm/slurmd.pid
     SlurmctldPort=6817
     SlurmdPort=6818
     SlurmdParameters=config_overrides
@@ -42,17 +42,18 @@ data:
     DefMemPerCPU=1024
     MaxMemPerCPU=8192
     Licenses=cadence:2,synopsys:2,siemens:1
-    NodeName=hpc-compute-nodes-[0-3] CPUs=2 RealMemory=3072 State=UNKNOWN
-    PartitionName=eda Nodes=hpc-compute-nodes-[0-3] Default=YES MaxTime=02:00:00 State=UP OverSubscribe=NO
-    PartitionName=debug Nodes=hpc-compute-nodes-[0-3] MaxTime=00:30:00 State=UP OverSubscribe=YES
-    PartitionName=ml Nodes=hpc-compute-nodes-[0-3] MaxTime=04:00:00 State=UP OverSubscribe=NO
+    NodeName=hpc-compute-nodes-0 NodeAddr=hpc-compute-nodes-0.hpc-compute-nodes CPUs=2 RealMemory=3072 State=UNKNOWN
+    NodeName=hpc-compute-nodes-1 NodeAddr=hpc-compute-nodes-1.hpc-compute-nodes CPUs=2 RealMemory=3072 State=UNKNOWN
+    PartitionName=eda Nodes=hpc-compute-nodes-[0-1] Default=YES MaxTime=02:00:00 State=UP OverSubscribe=NO
+    PartitionName=debug Nodes=hpc-compute-nodes-[0-1] MaxTime=00:30:00 State=UP OverSubscribe=YES
+    PartitionName=ml Nodes=hpc-compute-nodes-[0-1] MaxTime=04:00:00 State=UP OverSubscribe=NO
   slurmdbd.conf: |
     AuthType=auth/munge
     AuthInfo=/var/run/munge/munge.socket.2
     SlurmUser=slurm
     DebugLevel=verbose
     LogFile=/var/log/slurm/slurmdbd.log
-    PidFile=/run/slurmdbd.pid
+    PidFile=/run/slurm/slurmdbd.pid
     StorageType=accounting_storage/mysql
     StorageHost=mariadb-internal
     StoragePort=3306

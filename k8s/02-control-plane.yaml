@@ -29,6 +29,7 @@ spec:
       labels:
         app: hpc-scheduler-core
     spec:
+      hostname: hpc-scheduler-core
       containers:
         - name: slurmdbd
           image: zaratr/hpc-node:latest
@@ -44,8 +45,7 @@ spec:
               mountPath: /config
               readOnly: true
             - name: munge-key
-              mountPath: /config/munge.key
-              subPath: munge.key
+              mountPath: /munge-secret
               readOnly: true
         - name: slurmctld
           image: zaratr/hpc-node:latest
@@ -61,8 +61,7 @@ spec:
               mountPath: /config
               readOnly: true
             - name: munge-key
-              mountPath: /config/munge.key
-              subPath: munge.key
+              mountPath: /munge-secret
               readOnly: true
             - name: slurm-state
               mountPath: /var/spool/slurm/ctld

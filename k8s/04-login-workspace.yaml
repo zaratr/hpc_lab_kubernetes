@@ -41,8 +41,7 @@ spec:
               mountPath: /config
               readOnly: true
             - name: munge-key
-              mountPath: /config/munge.key
-              subPath: munge.key
+              mountPath: /munge-secret
               readOnly: true
             - name: home
               mountPath: /home/hpcuser

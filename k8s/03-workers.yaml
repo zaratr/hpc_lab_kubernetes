@@ -13,12 +13,13 @@ spec:
       targetPort: 6818
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: hpc-compute-nodes
   namespace: hpc-system
 spec:
-  replicas: 4
+  serviceName: hpc-compute-nodes
+  replicas: 2
   selector:
     matchLabels:
       app: hpc-compute-nodes
@@ -41,18 +42,17 @@ spec:
               containerPort: 6818
           resources:
             requests:
-              cpu: "2"
-              memory: 4Gi
+              cpu: "500m"
+              memory: 1Gi
             limits:
-              cpu: "4"
-              memory: 8Gi
+              cpu: "2"
+              memory: 3Gi
           volumeMounts:
             - name: slurm-config
               mountPath: /config
               readOnly: true
             - name: munge-key
-              mountPath: /config/munge.key
-              subPath: munge.key
+              mountPath: /munge-secret
               readOnly: true
             - name: home
               mountPath: /home/hpcuser

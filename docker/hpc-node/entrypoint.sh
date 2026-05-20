@@ -29,7 +29,9 @@ install_config() {
     install -o slurm -g slurm -m 0600 /config/slurmdbd.conf /etc/slurm/slurmdbd.conf
   fi
 
-  if [[ -f /config/munge.key ]]; then
+  if [[ -f /munge-secret/munge.key ]]; then
+    install -o munge -g munge -m 0400 /munge-secret/munge.key /etc/munge/munge.key
+  elif [[ -f /config/munge.key ]]; then
     install -o munge -g munge -m 0400 /config/munge.key /etc/munge/munge.key
   fi
 }
@@ -39,13 +41,18 @@ prepare_runtime() {
     /var/spool/slurm/ctld /var/spool/slurm/d /hpc-workspace \
     /home/hpcuser/work /projects /scratch /logs/jobs
   chown -R munge:munge /run/munge /var/log/munge
-  chown -R slurm:slurm /var/log/slurm /var/spool/slurm
+  touch /var/log/munge/munged.log
+  chown munge:munge /var/log/munge/munged.log
+  chmod 0755 /var/log/munge
+  chmod 0644 /var/log/munge/munged.log
+  chown -R slurm:slurm /run/slurm /var/log/slurm /var/spool/slurm
+  chmod 0755 /var/spool/slurm /var/spool/slurm/ctld /var/spool/slurm/d
   chown -R hpcuser:hpcuser /home/hpcuser /hpc-workspace /projects /scratch /logs || true
 
   install_config
 
   if [[ ! -f /etc/munge/munge.key ]]; then
-    echo "[ERROR] Missing /etc/munge/munge.key; mount the munge-key secret at /config/munge.key" >&2
+    echo "[ERROR] Missing /etc/munge/munge.key; mount the munge-key secret at /munge-secret/munge.key" >&2
     return 1
   fi
 
